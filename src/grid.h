@@ -38,11 +38,16 @@ signals:
 public slots:
 
     [[maybe_unused]] bool resize(const size_t& size) noexcept;
+    void                  activateTraces(bool) noexcept;
     void                  clear(void) noexcept;
+
+private:
+    void _updateTraces() noexcept;
 
 private:
     std::vector<Cell*> _cells; /*!< Cells of the Grid */
     size_t             _size{ 8 };
+    bool               _traces{ true };
 };
 
 #endif // GRID_H

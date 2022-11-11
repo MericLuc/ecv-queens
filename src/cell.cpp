@@ -18,7 +18,7 @@
 
 // External headers
 
-QSvgRenderer renderer(QString("imgs/queen.svg"));
+QSvgRenderer Cell::renderer{ QString("imgs/queen.svg") };
 
 /*****************************************************************************/
 Cell::Cell(const size_t x, const size_t y, const size_t dim, QWidget* parent) noexcept
@@ -27,6 +27,7 @@ Cell::Cell(const size_t x, const size_t y, const size_t dim, QWidget* parent) no
   , _y{ y }
   , _bg{ new QLabel(this) }
   , _lb{ new QLabel(this) }
+  , _highlight{ new QLabel(this) }
 {
     setMouseTracking(true);
     setFocusPolicy(Qt::StrongFocus);
@@ -54,6 +55,12 @@ Cell::Cell(const size_t x, const size_t y, const size_t dim, QWidget* parent) no
                     .arg(((x + y) % 2) ? "#C8D0DB" : "#E4E7EE"));
     _bg->setFixedSize(cSize);
     _bg->setStyleSheet(style);
+
+    // Setup highlight
+    _highlight->setFixedSize(cSize);
+    _highlight->setStyleSheet(
+      QString("background-color:rgba(250,250,155,0.26);border:transparent;"));
+    _highlight->setVisible(false);
 
     setUpdatesEnabled(true);
 }
@@ -91,10 +98,10 @@ Cell::mouseReleaseEvent(QMouseEvent* e)
 {
     if (Qt::LeftButton == e->button()) {
         _queen = !_queen;
-    }
 
-    emit changed(_queen);
-    draw();
+        draw();
+        emit changed(_queen);
+    }
 }
 
 /*****************************************************************************/
@@ -125,4 +132,11 @@ Cell::set(bool queen) noexcept
 
     _queen = queen;
     draw();
+}
+
+/*****************************************************************************/
+void
+Cell::setTrace(bool activate) noexcept
+{
+    _highlight->setVisible(activate);
 }

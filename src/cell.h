@@ -1,6 +1,7 @@
 #ifndef CELL_H
 #define CELL_H
 
+#include <QSvgRenderer>
 #include <QWidget>
 
 class QLabel;
@@ -30,6 +31,7 @@ protected:
 
     void updateVal(size_t) noexcept;
     void draw() noexcept;
+    void setTrace(bool) noexcept;
 
 private:
     const size_t _x, _y;
@@ -38,6 +40,9 @@ private:
     // UI related members
     QLabel* _bg{ nullptr };
     QLabel* _lb{ nullptr };
+    QLabel* _highlight{ nullptr };
+
+    static QSvgRenderer renderer;
 };
 
 #endif // CELL_H

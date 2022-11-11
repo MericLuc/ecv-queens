@@ -134,6 +134,9 @@ MainWindow::MainWindow(QWidget* parent)
     });
 
     // Connect buttons with Grid
+    connect(ui->cb_traces, &QCheckBox::clicked, this, [this](bool checked) {
+        ui->square_w->activateTraces(checked);
+    });
     connect(ui->cb_dims, &QComboBox::currentTextChanged, this, [this]() {
         ui->square_w->resize(ui->cb_dims->currentIndex() + 2);
     });
