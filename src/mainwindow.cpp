@@ -104,6 +104,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     setupWidget(ui->le_sols);
     setupWidget(ui->cb_dims);
+    setupWidget(ui->cb_traces);
 
     setStyleSheet("QLineEdit#setupWidget{background-color:#ffffff;color:#5F5F5F;}"
                   "QLineEdit#setupWidget:hover{background-color:#daffb3;}"
@@ -111,18 +112,75 @@ MainWindow::MainWindow(QWidget* parent)
                   "QPushButton#setupWidget:hover{background-color:#daffb3;}"
                   "QPushButton#setupWidget:pressed{background-color:#5cb300;}"
                   "QPushButton#setupWidget:!enabled{background-color:rgb(200, 200, 200);}"
-                  "QComboBox#setupWidget{background-color:#ffffff;color:#5F5F5F;}"
+                  "QComboBox#setupWidget{border-radius:3px;background-color:#ffffff;color:#5F5F5F;}"
                   "QComboBox#setupWidget:hover{background-color:#daffb3;}"
                   "QComboBox#setupWidget:pressed{background-color:#5cb300;}"
-                  "QComboBox#setupWidget:!enabled{background-color:rgb(200, 200, 200);}");
+                  "QComboBox#setupWidget:!enabled{background-color:rgb(200, 200, 200);}"
+                  "QCheckBox#setupWidget{background-color:transparent;color:#5F5F5F;}"
+                  "QCheckBox#setupWidget:hover{background-color:#daffb3;}"
+                  "QCheckBox#setupWidget:pressed{background-color:#5cb300;}"
+                  "QCheckBox#setupWidget:!enabled{background-color:rgb(200, 200, 200);}");
 
     for (auto& button : { ui->cb_dims })
         button->setStyleSheet(
           QString("border-top-right-radius:%1px;border-bottom-right-radius:%1px;").arg(3));
 
-    // TODO - Connect to grid changes
+    // Connect to grid changes
+    connect(ui->square_w, &Grid::changed, this, [this]() {
+        if (ui->res_gb->isEnabled()) {
+            ui->res_gb->setDisabled(true);
+            ui->res_label->clear();
+        }
+    });
 
-    // TODO - Connect buttons with Grid
+    // Connect buttons with Grid
+    connect(ui->cb_dims, &QComboBox::currentTextChanged, this, [this]() {
+        ui->square_w->resize(ui->cb_dims->currentIndex() + 2);
+    });
+    connect(ui->new_pb, &QPushButton::clicked, this, [this]() { ui->square_w->clear(); });
+    connect(ui->res_pb, &QPushButton::clicked, this, [this]() {
+        if (nullptr == _model || std::empty(_sols))
+            return;
+
+        static std::random_device dev;
+        static std::mt19937       rng{ dev() };
+
+        std::uniform_int_distribution<std::mt19937::result_type> dist{ 1, std::size(_sols) - 1 };
+
+        ui->square_w->fromData(_model->apply(_sols[dist(rng)]));
+        ui->centralwidget->repaint();
+    });
+    connect(ui->solve_pb, &QPushButton::clicked, this, [this]() {
+        ui->centralwidget->setGraphicsEffect(new QGraphicsBlurEffect);
+        ui->centralwidget->setDisabled(true);
+        ui->centralwidget->repaint();
+
+        // Perform the ecv resolution
+        _sols.clear();
+        if (nullptr != _model)
+            _model.reset(nullptr);
+        _model = ecv::NQueens::generate(ui->square_w->data());
+        if (nullptr == _model)
+            return;
+
+        stopwatch watch;
+        _sols = _model->solve(ui->le_sols->text().toULong());
+
+        if (auto solsNb{ std::size(_sols) }; solsNb > 0) {
+            ui->res_pb->setEnabled(solsNb > 1);
+            ui->res_gb->setEnabled(true);
+            ui->res_label->setText(QString("Found %1 solutions (%2 ms)")
+                                     .arg(std::size(_sols))
+                                     .arg(watch.elapsed().count()));
+            ui->square_w->fromData(_model->apply(_sols[0]));
+        } else {
+            ui->res_label->setText("No solution");
+        }
+
+        ui->centralwidget->setGraphicsEffect(nullptr);
+        ui->centralwidget->setDisabled(false);
+        ui->centralwidget->repaint();
+    });
 }
 
 /*****************************************************************************/

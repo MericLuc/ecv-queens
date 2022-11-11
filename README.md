@@ -38,8 +38,7 @@ It should be something like that (not garanteed) :
 
 _Rules_ : 
   - Hover a cell to select it.
-  - Left-click to add a queen to a cell.
-  - Right-click to remove a queen from a cell.
+  - Left-click to add/remove a queen to a cell.
   - For the rest, I think the UI buttons are self-explanatory 😁
 
 ## Acknowledgements
