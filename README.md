@@ -11,7 +11,7 @@ Under the hood, it uses the [**ECV library**](https://github.com/MericLuc/ecv) t
 ## How to build/install
 
 _Dependencies_ : 
-  - Qt5 (Qt5::Widgets package)
+  - Qt5 (Qt5::Widgets Qt5::Svg packages)
   - ecv (as a submodule)
 
 Start by getting the sources :
