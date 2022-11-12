@@ -132,6 +132,7 @@ Grid::fromData(const std::vector<std::string>& data) noexcept
         for (size_t j{ 0 }; j < _size; ++j, ++k)
             _cells[k]->set(data[i][j] != '0');
 
+    activateTraces(_traces);
     return true;
 }
 

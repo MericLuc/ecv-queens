@@ -140,7 +140,10 @@ MainWindow::MainWindow(QWidget* parent)
     connect(ui->cb_dims, &QComboBox::currentTextChanged, this, [this]() {
         ui->square_w->resize(ui->cb_dims->currentIndex() + 2);
     });
-    connect(ui->new_pb, &QPushButton::clicked, this, [this]() { ui->square_w->clear(); });
+    connect(ui->new_pb, &QPushButton::clicked, this, [this]() {
+        ui->square_w->clear();
+        ui->centralwidget->repaint();
+    });
     connect(ui->res_pb, &QPushButton::clicked, this, [this]() {
         if (nullptr == _model || std::empty(_sols))
             return;
